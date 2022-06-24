@@ -8,18 +8,22 @@ namespace MagniboardBackend.Data.Configurations
     {
         public Mapperinitializer()
         {
-            CreateMap<Table, TableDTO>().ReverseMap(); ;
-            CreateMap<TableDTO, Table>().ReverseMap(); ;
-            //CreateMap<Table, CreateTableDTO>().ReverseMap();
-           // CreateMap<Table, TableReadOnlyDTO>().ReverseMap();
+            CreateMap<Magnets, MagnetDTO>().ReverseMap();
+            CreateMap<Magnets, GetMagnetDTO>().ReverseMap(); 
+            CreateMap<Magnets, PutMagnetDTO>().ReverseMap();
+            CreateMap<Magnets, PostMagnetDTO>().ReverseMap();
+
+
+            CreateMap<Table, TableDTO>().ReverseMap();
+            CreateMap<Table, GetTableDTO>().ReverseMap();
+            CreateMap<Table, PutTableDTO>().ReverseMap();
+            CreateMap<Table, PostTableDTO>().ReverseMap();
+
 
             CreateMap<Row, RowDTO>().ReverseMap(); ;
-            CreateMap<RowDTO, Row>().ReverseMap(); ;
-            // CreateMap<Row, CreateRowDTO>().ReverseMap();
-            // CreateMap<Row, RowReadOnlyDTO>().ReverseMap();
+
 
             CreateMap<Cell, CellDTO>().ReverseMap();
-            CreateMap<CellDTO, Cell>().ReverseMap();
 
         }
     }

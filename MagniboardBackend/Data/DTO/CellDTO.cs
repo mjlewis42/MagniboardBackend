@@ -7,17 +7,11 @@ namespace MagniboardBackend.Data.DTO
     {
         [Required]
         public int id { get; set; }
-        [Required]
         public int cellOrder { get; set; }
-        [Required]
         public int colSpan { get; set; }
-        [Required]
         public int rowSpan { get; set; }
-        [Required]
         public bool header { get; set; }
-        [Required]
         public bool droppable { get; set; }
-        [Required]
         public string text { get; set; }
 
         [Required]

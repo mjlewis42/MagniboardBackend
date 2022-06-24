@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MagniboardBackend.Data;
 using MagniboardBackend.Data.EntityModels;
+using AutoMapper;
+using MagniboardBackend.Data.DTO;
 
 namespace MagniboardBackend.Controllers
 {
@@ -15,52 +17,67 @@ namespace MagniboardBackend.Controllers
     public class MagnetsController : ControllerBase
     {
         private readonly MagniboardDbConnection _context;
+        private readonly IMapper mapper;
 
-        public MagnetsController(MagniboardDbConnection context)
+        public MagnetsController(MagniboardDbConnection context, IMapper mapper)
         {
             _context = context;
+            this.mapper = mapper;
         }
 
         // GET: api/Magnets
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Magnets>>> GetMagnets()
+        public async Task<ActionResult<IEnumerable<MagnetDTO>>> GetMagnets()
         {
             if (_context.Magnets == null)
             {
                 return NotFound();
             }
-            return await _context.Magnets.ToListAsync();
+
+            var magnets = await _context.Magnets.ToListAsync();
+            var magnetDTOs = mapper.Map<List<MagnetDTO>>(magnets);
+
+            return Ok(magnetDTOs);
         }
 
         // GET: api/Magnets/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Magnets>> GetMagnets(int id)
+        public async Task<ActionResult<GetMagnetDTO>> GetMagnets(int id)
         {
             if (_context.Magnets == null)
             {
                 return NotFound();
             }
-            var magnets = await _context.Magnets.FindAsync(id);
+            var magnet = await _context.Magnets.FindAsync(id);
+            var magnetDTO = mapper.Map<GetMagnetDTO>(magnet);
 
-            if (magnets == null)
+            if (magnet == null)
             {
                 return NotFound();
             }
 
-            return magnets;
+            return Ok(magnetDTO);
         }
 
         // PUT: api/Magnets/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMagnets(int id, Magnets magnets)
+        public async Task<IActionResult> PutMagnets(int id, PutMagnetDTO magnetDTO)
         {
-            if (id != magnets.Id)
+            if (id != magnetDTO.Id || _context.Magnets == null) 
             {
                 return BadRequest();
             }
 
-            _context.Entry(magnets).State = EntityState.Modified;
+            var magnet = await _context.Magnets.FindAsync(id);
+
+            if (magnet == null)
+            {
+                return BadRequest();
+            }
+
+            mapper.Map(magnetDTO, magnet);
+            _context.Entry(magnet).State = EntityState.Modified;
 
             try
             {
@@ -84,16 +101,18 @@ namespace MagniboardBackend.Controllers
         // POST: api/Magnets
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Magnets>> PostMagnets(Magnets magnets)
+        public async Task<ActionResult<PostMagnetDTO>> PostMagnets(PostMagnetDTO magnetDTO)
         {
             if (_context.Magnets == null)
             {
-                return Problem("Entity set 'MagniboardBackendContext.Magnets'  is null.");
+                return Problem("Entity set 'Connection Magnets'  is null.");
             }
-            _context.Magnets.Add(magnets);
+
+            var magnet = mapper.Map<Magnets>(magnetDTO);
+            _context.Magnets.Add(magnet);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetMagnets", new { id = magnets.Id }, magnets);
+            return CreatedAtAction("GetMagnets", new { id = magnet.Id }, magnet);
         }
 
         // DELETE: api/Magnets/5

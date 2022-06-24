@@ -30,6 +30,11 @@ namespace MagniboardBackend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TableDTO>>> GetTable()
         {
+            if (_context.Table == null)
+            {
+                return NotFound();
+            }
+
             var tables = await _context.Table
                 .Include(i => i.rows)
                     .ThenInclude(j => j.cells)
@@ -41,33 +46,45 @@ namespace MagniboardBackend.Controllers
 
         // GET: api/Table/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Table>> GetTable(int id)
+        public async Task<ActionResult<GetTableDTO>> GetTable(int id)
         {
-          if (_context.Table == null)
-          {
-              return NotFound();
-          }
-            var Table = await _context.Table.FindAsync(id);
+             if (_context.Table == null)
+             {
+                 return NotFound();
+             }
 
-            if (Table == null)
-            {
-                return NotFound();
-            }
+            var table = await _context.Table
+                .Include(i => i.rows)
+                    .ThenInclude(j => j.cells)
+                .FirstOrDefaultAsync(x => x.id == id);
+            
+            var tableDTO = mapper.Map<GetTableDTO>(table);
 
-            return Table;
+            return tableDTO;
         }
 
         // PUT: api/Table/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTable(int id, Table Table)
+        public async Task<ActionResult<GetTableDTO>> PutTable(int id, PutTableDTO tableDTO)
         {
-            if (id != Table.id)
+            if (id != tableDTO.id || _context.Table == null)
             {
                 return BadRequest();
             }
 
-            _context.Entry(Table).State = EntityState.Modified;
+            var table = await _context.Table
+                .Include(i => i.rows)
+                    .ThenInclude(j => j.cells)
+                .FirstOrDefaultAsync(x => x.id == id);
+
+            if(table == null)
+            {
+                return BadRequest();
+            }
+
+            mapper.Map(tableDTO, table);
+            _context.Entry(table).State = EntityState.Modified;
 
             try
             {
@@ -91,21 +108,18 @@ namespace MagniboardBackend.Controllers
         // POST: api/Table
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<IActionResult> PostTable([FromBody] Table Table)
+        public async Task<ActionResult<PostTableDTO>> PostTable([FromBody] PostTableDTO tableDTO)
         {
             if (_context.Table == null)
             {
-                return Problem("Entity set 'MagniboardDbConnection.Table'  is null.");
+                return Problem("Entity set 'Connection'  is null.");
             }
 
-            Console.WriteLine(Json(Table));
-
-            _context.Table.Add(Table);
+            var table = mapper.Map<Table>(tableDTO);
+            await _context.Table.AddAsync(table);
             await _context.SaveChangesAsync();
 
-            //return Ok(Json(tableData));
-            //return NoContent();
-            return CreatedAtAction("GetTable", new { id = Table.id }, Table);
+            return CreatedAtAction(nameof(GetTable), new { id = table.id }, table);
         }
 
         // DELETE: api/Table/5
@@ -116,13 +130,17 @@ namespace MagniboardBackend.Controllers
             {
                 return NotFound();
             }
-            var Table = await _context.Table.FindAsync(id);
-            if (Table == null)
+            var table = await _context.Table
+                .Include(i => i.rows)
+                    .ThenInclude(j => j.cells)
+                .FirstOrDefaultAsync(x => x.id == id);
+
+            if (table == null)
             {
                 return NotFound();
             }
 
-            _context.Table.Remove(Table);
+            _context.Table.Remove(table);
             await _context.SaveChangesAsync();
 
             return NoContent();

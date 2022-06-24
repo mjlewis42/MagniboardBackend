@@ -1,5 +1,4 @@
-﻿
-namespace MagniboardBackend.Data
+﻿namespace MagniboardBackend.Data.EntityModels
 {
     public partial class Magnets
     {

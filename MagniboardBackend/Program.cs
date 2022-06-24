@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MagniboardBackend.Data;
+using MagniboardBackend.Data.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,8 @@ builder.Services.AddCors(options =>
         .AllowAnyHeader()
         .AllowAnyOrigin());
 });
+
+builder.Services.AddAutoMapper(typeof(Mapperinitializer));
 
 var app = builder.Build();
 

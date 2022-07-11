@@ -36,10 +36,16 @@ namespace MagniboardBackend.Data
                 .HasConversion(
                     v => v ? 1 : 0,
                     v => (v == 1));
+            modelBuilder
+                .Entity<Board>()
+                .Property(p => p.isActive)
+                .HasConversion(
+                    v => v ? 1 : 0,
+                    v => (v == 1));
         }
 
-        public DbSet<Magnets>? Magnets { get; set; }
-        public DbSet<Table>? Table { get; set; }
-        //public DbSet<Board>? Board { get; set; }
+        public DbSet<Magnets> Magnets { get; set; }
+        public DbSet<Table> Table { get; set; }
+        public DbSet<Board> Board { get; set; }
     }
 }

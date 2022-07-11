@@ -9,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MagniboardDbConnection>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MagniboardDbConnection") ?? throw new InvalidOperationException("Connection string 'MagniboardDbConnection' not found.")));
 
+
+
+
 // Add services to the container.
 var connString = builder.Configuration.GetConnectionString("MagniboardDbConnection");
 builder.Services.AddDbContext<MagniboardDbConnection>(options => options.UseSqlServer(connString));
@@ -29,7 +32,11 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddAutoMapper(typeof(Mapperinitializer));
 
+
+//Add additional routing
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

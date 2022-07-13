@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MagniboardBackend.Data;
 using MagniboardBackend.Data.EntityModels;
+using MagniboardBackend.Data.DTO;
+using AutoMapper;
 
 namespace MagniboardBackend.Controllers
 {
@@ -15,10 +17,12 @@ namespace MagniboardBackend.Controllers
     public class BoardsController : ControllerBase
     {
         private readonly MagniboardDbConnection _context;
+        private readonly IMapper mapper;
 
-        public BoardsController(MagniboardDbConnection context)
+        public BoardsController(MagniboardDbConnection context, IMapper mapper)
         {
             _context = context;
+            this.mapper = mapper;
         }
 
         // GET: api/Boards
@@ -30,7 +34,7 @@ namespace MagniboardBackend.Controllers
               return NotFound();
           }
             var boards = await _context.Board
-                .Include(i => i.tables)
+                .Include(i => i.templates)
                     .ThenInclude(j => j.rows)
                         .ThenInclude(k => k.cells)
                 .ToListAsync();
@@ -48,7 +52,7 @@ namespace MagniboardBackend.Controllers
             }
             var boards = await _context.Board
                 .Where(b => b.isActive)
-                    .Include(i => i.tables)
+                    .Include(i => i.templates)
                 .ToListAsync();
 
             return Ok(boards);
@@ -64,7 +68,7 @@ namespace MagniboardBackend.Controllers
           }
             //var board = await _context.Board.FindAsync(id);
             var board = await _context.Board
-                    .Include(i => i.tables)
+                    .Include(i => i.templates)
                             .ThenInclude(j => j.rows)
                                 .ThenInclude(k => k.cells)
                 .FirstOrDefaultAsync(i => i.id == id);
@@ -87,7 +91,7 @@ namespace MagniboardBackend.Controllers
             //var board = await _context.Board.FindAsync(id);
             var board = await _context.Board
                 .Where(b => b.isActive)
-                    .Include(i => i.tables)
+                    .Include(i => i.templates)
                             .ThenInclude(j => j.rows)
                                 .ThenInclude(k => k.cells)
                 .FirstOrDefaultAsync(i => i.id == id);
@@ -96,6 +100,8 @@ namespace MagniboardBackend.Controllers
             {
                 return NotFound();
             }
+
+            var boardDTO = mapper.Map<GetBoardDTO>(board);
 
             return board;
         }
@@ -140,7 +146,7 @@ namespace MagniboardBackend.Controllers
             {
                 return BadRequest();
             }
-            if(board.tables.Count == 0)
+            if(board.templates.Count == 0)
             {
                 Console.WriteLine("ERROR Triggered in ChangeBoardStatus: No linked tables found in request");
                 return BadRequest();

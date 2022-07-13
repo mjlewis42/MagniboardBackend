@@ -10,5 +10,6 @@ namespace MagniboardBackend.Data.DTO
         [StringLength(maximumLength: 50, ErrorMessage = "Your table name is too long!")]
         public string MagnetName { get; set; } = null!;
         public string MagnetColor { get; set; } = null!;
+        public string TextColor { get; set; } = null!;
     }
 }

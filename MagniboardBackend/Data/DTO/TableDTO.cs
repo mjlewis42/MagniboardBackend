@@ -13,6 +13,8 @@ namespace MagniboardBackend.Data.DTO
         public string tableHeader { get; set; }
 
         public bool showTableHeader { get; set; }
+        
+        public int? boardId { get; set; }
 
         public IList<RowDTO> rows { get; set; }
     }

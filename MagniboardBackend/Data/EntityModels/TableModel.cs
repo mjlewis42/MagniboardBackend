@@ -14,6 +14,8 @@ namespace MagniboardBackend.Data.EntityModels
 
         public bool showTableHeader { get; set; }
 
+        public int? boardId { get; set; }
+
         public virtual IList<Row> rows { get; set; }
     }
 }

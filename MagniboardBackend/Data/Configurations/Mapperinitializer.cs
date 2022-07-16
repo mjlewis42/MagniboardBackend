@@ -18,8 +18,10 @@ namespace MagniboardBackend.Data.Configurations
             CreateMap<Table, GetTableDTO>().ReverseMap();
             CreateMap<Table, PutTableDTO>().ReverseMap();
             CreateMap<Table, PostTableDTO>().ReverseMap();
+            CreateMap<Table, PutTableBoardIdDTO>().ReverseMap();
 
             CreateMap<Board, GetBoardDTO>().ReverseMap();
+            CreateMap<Board, PostBoardDTO>().ReverseMap();
             //CreateMap<Board, GetBoardDTO>()
             //    .ForMember(dest => dest.templates, opt => opt.MapFrom(src => src.tables))
             //    .ReverseMap();

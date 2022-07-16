@@ -2,7 +2,7 @@
 
 namespace MagniboardBackend.Data.DTO
 {
-    public class GetTableDTO
+    public class GetTableDTO : TableDTO
     {
         [Required]
         public int id { get; set; }

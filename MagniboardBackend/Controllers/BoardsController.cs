@@ -82,7 +82,7 @@ namespace MagniboardBackend.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Board>> GetBoardActive(int id)
+        public async Task<ActionResult<GetBoardDTO>> GetBoardActive(int id)
         {
             if (_context.Board == null)
             {
@@ -103,7 +103,7 @@ namespace MagniboardBackend.Controllers
 
             var boardDTO = mapper.Map<GetBoardDTO>(board);
 
-            return board;
+            return Ok(boardDTO);
         }
 
         // PUT: api/Boards/5
@@ -177,16 +177,18 @@ namespace MagniboardBackend.Controllers
         // POST: api/Boards
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Board>> PostBoard(Board board)
+        public async Task<ActionResult<PostBoardDTO>> PostBoard([FromBody] PostBoardDTO boardDTO)
         {
-          if (_context.Board == null)
-          {
-              return Problem("Entity set 'MagniboardDbConnection.Board'  is null.");
-          }
-            _context.Board.Add(board);
+            if (_context.Board == null)
+            {
+                return Problem("Entity set 'Connection'  is null.");
+            }
+
+            var board = mapper.Map<Board>(boardDTO);
+            await _context.Board.AddAsync(board);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetBoard", new { id = board.id }, board);
+            return CreatedAtAction(nameof(GetBoard), new { id = board.id }, board);
         }
 
         // DELETE: api/Boards/5
@@ -198,6 +200,16 @@ namespace MagniboardBackend.Controllers
                 return NotFound();
             }
             var board = await _context.Board.FindAsync(id);
+
+            var table = await _context.Table
+                    .Where(b => b.boardId == id)
+                .ToListAsync();
+
+            foreach(var i in table)
+            {
+                i.boardId = null;
+            }
+
             if (board == null)
             {
                 return NotFound();

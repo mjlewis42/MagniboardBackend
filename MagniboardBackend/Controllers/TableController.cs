@@ -13,7 +13,7 @@ using MagniboardBackend.Data.DTO;
 
 namespace MagniboardBackend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class TableController : Controller
     {
@@ -28,7 +28,7 @@ namespace MagniboardBackend.Controllers
 
         // GET: api/Table
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TableDTO>>> GetTable()
+        public async Task<ActionResult<IEnumerable<TableDTO>>> GetTables()
         {
             if (_context.Table == null)
             {
@@ -63,10 +63,30 @@ namespace MagniboardBackend.Controllers
             return tableDTO;
         }
 
+        // GET: api/Table/GetUnlinkedTables
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TableDTO>>> GetUnlinkedTables()
+        {
+            if (_context.Table == null)
+            {
+                return NotFound();
+            }
+
+            var tables = await _context.Table
+                 .Where(b => b.boardId == null)
+                    .Include(i => i.rows)
+                        .ThenInclude(j => j.cells)
+                    .ToListAsync();
+
+            var tableDTOs = mapper.Map<List<TableDTO>>(tables);
+
+            return Ok(tableDTOs);
+        }
+
         // PUT: api/Table/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<ActionResult<GetTableDTO>> PutTable(int id, PutTableDTO tableDTO)
+        public async Task<ActionResult<PutTableDTO>> PutTable(int id, PutTableDTO tableDTO)
         {
             if (id != tableDTO.id || _context.Table == null)
             {
@@ -105,6 +125,45 @@ namespace MagniboardBackend.Controllers
             return NoContent();
         }
 
+        // PUT: api/Table/PutTableBoardId/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<ActionResult<PutTableBoardIdDTO>> PutTableBoardId(int id, PutTableBoardIdDTO tableDTO)
+        {
+            if (id != tableDTO.id || _context.Table == null)
+            {
+                return BadRequest();
+            }
+
+            var table = await _context.Table.FirstOrDefaultAsync(x => x.id == id);
+
+            if (table == null)
+            {
+                return BadRequest();
+            }
+
+            mapper.Map(tableDTO, table);
+            _context.Entry(table).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TableExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Ok(tableDTO);
+        }
+
         // POST: api/Table
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -119,7 +178,7 @@ namespace MagniboardBackend.Controllers
             await _context.Table.AddAsync(table);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetTable), new { id = table.id }, table);
+            return Ok(table);
         }
 
         // DELETE: api/Table/5

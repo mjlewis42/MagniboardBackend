@@ -74,8 +74,7 @@ namespace MagniboardBackend.Controllers
 
             var tables = await _context.Table
                  .Where(b => b.boardId == null)
-                    .Include(i => i.rows)
-                        .ThenInclude(j => j.cells)
+                    
                     .ToListAsync();
 
             var tableDTOs = mapper.Map<List<TableDTO>>(tables);
@@ -135,6 +134,17 @@ namespace MagniboardBackend.Controllers
                 return BadRequest();
             }
 
+            //remove other tables first
+            var priorTable = await _context.Table
+                    .Where(b => b.boardId == tableDTO.boardId)
+                .ToListAsync();
+
+            foreach (var i in priorTable)
+            {
+                i.boardId = null;
+            }
+
+            //update new table
             var table = await _context.Table.FirstOrDefaultAsync(x => x.id == id);
 
             if (table == null)
@@ -160,6 +170,7 @@ namespace MagniboardBackend.Controllers
                     throw;
                 }
             }
+
 
             return Ok(tableDTO);
         }

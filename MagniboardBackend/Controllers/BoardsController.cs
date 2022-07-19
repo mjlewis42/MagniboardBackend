@@ -109,13 +109,16 @@ namespace MagniboardBackend.Controllers
         // PUT: api/Boards/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBoard(int id, Board board)
+        public async Task<IActionResult> PutBoard(int id, PutBoardDTO boardDTO)
         {
-            if (id != board.id)
+            var board = await _context.Board.FindAsync(id);
+
+            if (board == null)
             {
                 return BadRequest();
             }
 
+            mapper.Map(boardDTO, board);
             _context.Entry(board).State = EntityState.Modified;
 
             try
@@ -177,7 +180,7 @@ namespace MagniboardBackend.Controllers
         // POST: api/Boards
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PostBoardDTO>> PostBoard([FromBody] PostBoardDTO boardDTO)
+        public async Task<ActionResult<PostBoardDTO>> PostBoard(int tableId, [FromBody] PostBoardDTO boardDTO)
         {
             if (_context.Board == null)
             {
@@ -188,7 +191,7 @@ namespace MagniboardBackend.Controllers
             await _context.Board.AddAsync(board);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetBoard), new { id = board.id }, board);
+            return Ok(board);
         }
 
         // DELETE: api/Boards/5
@@ -200,7 +203,6 @@ namespace MagniboardBackend.Controllers
                 return NotFound();
             }
             var board = await _context.Board.FindAsync(id);
-
             var table = await _context.Table
                     .Where(b => b.boardId == id)
                 .ToListAsync();

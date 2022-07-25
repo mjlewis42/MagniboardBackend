@@ -97,9 +97,65 @@ namespace MagniboardBackend.Controllers
                     .ThenInclude(j => j.cells)
                 .FirstOrDefaultAsync(x => x.id == id);
 
+            if(table.boardId != null) { 
+                return BadRequest(); 
+            }
             if(table == null)
             {
                 return BadRequest();
+            }
+
+            mapper.Map(tableDTO, table);
+            _context.Entry(table).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TableExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<PutUnlinkTableDTO>> PutUnlinkTable(int id, PutUnlinkTableDTO tableDTO)
+        {
+            if (_context.Table == null)
+            {
+                return BadRequest();
+            }
+
+            var table = await _context.Table
+                .FirstOrDefaultAsync(x => x.id == id);
+
+            if (table == null)
+            {
+                return BadRequest();
+            }
+
+            var board = await _context.Board
+                .FirstOrDefaultAsync(x => x.id == table.boardId);
+
+            if (board == null)
+            {
+                return BadRequest();
+            }
+
+            if (board.isActive)
+            {
+
+                return StatusCode(400, "Unable to unlink table from live board.");
             }
 
             mapper.Map(tableDTO, table);
@@ -205,9 +261,16 @@ namespace MagniboardBackend.Controllers
                     .ThenInclude(j => j.cells)
                 .FirstOrDefaultAsync(x => x.id == id);
 
+            //if table.boardId != null
             if (table == null)
             {
                 return NotFound();
+            }
+            if(table.boardId != null)
+            {
+                var board = await _context.Board
+                    .FirstOrDefaultAsync(x => x.id == table.boardId);
+                board.isActive = false;
             }
 
             _context.Table.Remove(table);

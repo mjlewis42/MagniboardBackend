@@ -117,6 +117,10 @@ namespace MagniboardBackend.Controllers
             {
                 return BadRequest();
             }
+            if (board.isActive)
+            {
+                return BadRequest();
+            }
 
             mapper.Map(boardDTO, board);
             _context.Entry(board).State = EntityState.Modified;

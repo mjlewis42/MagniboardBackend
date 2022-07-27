@@ -2,7 +2,7 @@
 
 namespace MagniboardBackend.Data.DTO
 {
-    public class PutTableBoardIdDTO
+    public class PutTemplateBoardIdDTO
     {
         [Required]
         public int id { get; set; }

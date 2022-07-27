@@ -1,6 +1,6 @@
 ﻿namespace MagniboardBackend.Data.EntityModels
 {
-    public partial class Magnets
+    public partial class Magnet
     {
         public int Id { get; set; }
         public string MagnetName { get; set; } = null!;

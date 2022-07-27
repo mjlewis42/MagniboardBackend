@@ -2,22 +2,21 @@
 
 namespace MagniboardBackend.Data.DTO
 {
-    public class GetTemplateDTO : TemplateDTO
+    public class TemplateDTO
     {
-        [Required]
         public int id { get; set; }
 
         [Required]
         [StringLength(maximumLength: 50, ErrorMessage = "Your Template name is too long!")]
-        public string TemplateName { get; set; }
+        public string templateName { get; set; }
 
-        [Required]
-        public string TemplateHeader { get; set; }
+        public string templateHeader { get; set; }
 
-        [Required]
         public bool showTemplateHeader { get; set; }
+        
+        public int? boardId { get; set; }
 
-        [Required]
         public IList<RowDTO> rows { get; set; }
     }
+
 }

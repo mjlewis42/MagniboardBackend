@@ -8,6 +8,6 @@ namespace MagniboardBackend.Data.EntityModels
         public string boardName { get; set; }
         public bool isActive { get; set; }
         [JsonPropertyName("templates")]
-        public List<Table> templates { get; set; }
+        public List<Template> templates { get; set; }
     }
 }

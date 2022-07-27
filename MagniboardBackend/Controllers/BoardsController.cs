@@ -60,7 +60,7 @@ namespace MagniboardBackend.Controllers
 
         // GET: api/Boards/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Board>> GetBoard(int id)
+        public async Task<ActionResult<Board>> GetBoardById(int id)
         {
           if (_context.Board == null)
           {
@@ -82,7 +82,7 @@ namespace MagniboardBackend.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<GetBoardDTO>> GetBoardActive(int id)
+        public async Task<ActionResult<GetBoardDTO>> GetActiveBoardById(int id)
         {
             if (_context.Board == null)
             {
@@ -145,7 +145,7 @@ namespace MagniboardBackend.Controllers
         }
 
 
-        //PUT board by Id and change current status to the opposite only if table length of incoming variable is not 0. Otherwise return error.
+        //PUT board by Id and change current status to the opposite only if Template length of incoming variable is not 0. Otherwise return error.
         [HttpPut("{id}")]
         public async Task<IActionResult> ChangeBoardStatus(int id, Board board)
         {
@@ -155,7 +155,7 @@ namespace MagniboardBackend.Controllers
             }
             if(board.templates.Count == 0)
             {
-                Console.WriteLine("ERROR Triggered in ChangeBoardStatus: No linked tables found in request");
+                Console.WriteLine("ERROR Triggered in ChangeBoardStatus: No linked Templates found in request");
                 return BadRequest();
             }
 
@@ -184,7 +184,7 @@ namespace MagniboardBackend.Controllers
         // POST: api/Boards
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PostBoardDTO>> PostBoard(int tableId, [FromBody] PostBoardDTO boardDTO)
+        public async Task<ActionResult<PostBoardDTO>> PostBoard(int TemplateId, [FromBody] PostBoardDTO boardDTO)
         {
             if (_context.Board == null)
             {
@@ -207,11 +207,11 @@ namespace MagniboardBackend.Controllers
                 return NotFound();
             }
             var board = await _context.Board.FindAsync(id);
-            var table = await _context.Table
+            var Template = await _context.Template
                     .Where(b => b.boardId == id)
                 .ToListAsync();
 
-            foreach(var i in table)
+            foreach(var i in Template)
             {
                 i.boardId = null;
             }

@@ -15,98 +15,98 @@ namespace MagniboardBackend.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class TableController : Controller
+    public class TemplateController : Controller
     {
         private readonly MagniboardDbConnection _context;
         private readonly IMapper mapper;
 
-        public TableController(MagniboardDbConnection context, IMapper mapper)
+        public TemplateController(MagniboardDbConnection context, IMapper mapper)
         {
             _context = context;
             this.mapper = mapper;
         }
 
-        // GET: api/Table
+        // GET: api/Template
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TableDTO>>> GetTables()
+        public async Task<ActionResult<IEnumerable<TemplateDTO>>> GetTemplates()
         {
-            if (_context.Table == null)
+            if (_context.Template == null)
             {
                 return NotFound();
             }
 
-            var tables = await _context.Table
+            var Templates = await _context.Template
                 .Include(i => i.rows)
                     .ThenInclude(j => j.cells)
                 .ToListAsync();
-            var tableDTOs = mapper.Map<List<TableDTO>>(tables);
+            var TemplateDTOs = mapper.Map<List<TemplateDTO>>(Templates);
             
-            return Ok(tableDTOs);
+            return Ok(TemplateDTOs);
         }
 
-        // GET: api/Table/5
+        // GET: api/Template/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<GetTableDTO>> GetTable(int id)
+        public async Task<ActionResult<GetTemplateDTO>> GetTemplate(int id)
         {
-             if (_context.Table == null)
+             if (_context.Template == null)
              {
                  return NotFound();
              }
 
-            var table = await _context.Table
+            var Template = await _context.Template
                 .Include(i => i.rows)
                     .ThenInclude(j => j.cells)
                 .FirstOrDefaultAsync(x => x.id == id);
             
-            var tableDTO = mapper.Map<GetTableDTO>(table);
+            var TemplateDTO = mapper.Map<GetTemplateDTO>(Template);
 
-            return tableDTO;
+            return TemplateDTO;
         }
 
-        // GET: api/Table/GetUnlinkedTables
+        // GET: api/Template/GetUnlinkedTemplates
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TableDTO>>> GetUnlinkedTables()
+        public async Task<ActionResult<IEnumerable<TemplateDTO>>> GetUnlinkedTemplates()
         {
-            if (_context.Table == null)
+            if (_context.Template == null)
             {
                 return NotFound();
             }
 
-            var tables = await _context.Table
+            var Templates = await _context.Template
                  .Where(b => b.boardId == null)
                     
                     .ToListAsync();
 
-            var tableDTOs = mapper.Map<List<TableDTO>>(tables);
+            var TemplateDTOs = mapper.Map<List<TemplateDTO>>(Templates);
 
-            return Ok(tableDTOs);
+            return Ok(TemplateDTOs);
         }
 
-        // PUT: api/Table/5
+        // PUT: api/Template/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<ActionResult<PutTableDTO>> PutTable(int id, PutTableDTO tableDTO)
+        public async Task<ActionResult<PutTemplateDTO>> PutTemplate(int id, PutTemplateDTO TemplateDTO)
         {
-            if (id != tableDTO.id || _context.Table == null)
+            if (id != TemplateDTO.id || _context.Template == null)
             {
                 return BadRequest();
             }
 
-            var table = await _context.Table
+            var Template = await _context.Template
                 .Include(i => i.rows)
                     .ThenInclude(j => j.cells)
                 .FirstOrDefaultAsync(x => x.id == id);
 
-            if(table.boardId != null) { 
+            if(Template.boardId != null) { 
                 return BadRequest(); 
             }
-            if(table == null)
+            if(Template == null)
             {
                 return BadRequest();
             }
 
-            mapper.Map(tableDTO, table);
-            _context.Entry(table).State = EntityState.Modified;
+            mapper.Map(TemplateDTO, Template);
+            _context.Entry(Template).State = EntityState.Modified;
 
             try
             {
@@ -114,7 +114,7 @@ namespace MagniboardBackend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TableExists(id))
+                if (!TemplateExists(id))
                 {
                     return NotFound();
                 }
@@ -129,23 +129,23 @@ namespace MagniboardBackend.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<PutUnlinkTableDTO>> PutUnlinkTable(int id, PutUnlinkTableDTO tableDTO)
+        public async Task<ActionResult<PutUnlinkTemplateDTO>> PutUnlinkTemplate(int id, PutUnlinkTemplateDTO TemplateDTO)
         {
-            if (_context.Table == null)
+            if (_context.Template == null)
             {
                 return BadRequest();
             }
 
-            var table = await _context.Table
+            var Template = await _context.Template
                 .FirstOrDefaultAsync(x => x.id == id);
 
-            if (table == null)
+            if (Template == null)
             {
                 return BadRequest();
             }
 
             var board = await _context.Board
-                .FirstOrDefaultAsync(x => x.id == table.boardId);
+                .FirstOrDefaultAsync(x => x.id == Template.boardId);
 
             if (board == null)
             {
@@ -155,11 +155,11 @@ namespace MagniboardBackend.Controllers
             if (board.isActive)
             {
 
-                return StatusCode(400, "Unable to unlink table from live board.");
+                return StatusCode(400, "Unable to unlink Template from live board.");
             }
 
-            mapper.Map(tableDTO, table);
-            _context.Entry(table).State = EntityState.Modified;
+            mapper.Map(TemplateDTO, Template);
+            _context.Entry(Template).State = EntityState.Modified;
 
             try
             {
@@ -167,7 +167,7 @@ namespace MagniboardBackend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TableExists(id))
+                if (!TemplateExists(id))
                 {
                     return NotFound();
                 }
@@ -180,36 +180,36 @@ namespace MagniboardBackend.Controllers
             return NoContent();
         }
 
-        // PUT: api/Table/PutTableBoardId/5
+        // PUT: api/Template/PutTemplateBoardId/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<ActionResult<PutTableBoardIdDTO>> PutTableBoardId(int id, PutTableBoardIdDTO tableDTO)
+        public async Task<ActionResult<PutTemplateBoardIdDTO>> PutTemplateBoardId(int id, PutTemplateBoardIdDTO TemplateDTO)
         {
-            if (id != tableDTO.id || _context.Table == null)
+            if (id != TemplateDTO.id || _context.Template == null)
             {
                 return BadRequest();
             }
 
-            //remove other tables first
-            var priorTable = await _context.Table
-                    .Where(b => b.boardId == tableDTO.boardId)
+            //remove other Templates first
+            var priorTemplate = await _context.Template
+                    .Where(b => b.boardId == TemplateDTO.boardId)
                 .ToListAsync();
 
-            foreach (var i in priorTable)
+            foreach (var i in priorTemplate)
             {
                 i.boardId = null;
             }
 
-            //update new table
-            var table = await _context.Table.FirstOrDefaultAsync(x => x.id == id);
+            //update new Template
+            var Template = await _context.Template.FirstOrDefaultAsync(x => x.id == id);
 
-            if (table == null)
+            if (Template == null)
             {
                 return BadRequest();
             }
 
-            mapper.Map(tableDTO, table);
-            _context.Entry(table).State = EntityState.Modified;
+            mapper.Map(TemplateDTO, Template);
+            _context.Entry(Template).State = EntityState.Modified;
 
             try
             {
@@ -217,7 +217,7 @@ namespace MagniboardBackend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TableExists(id))
+                if (!TemplateExists(id))
                 {
                     return NotFound();
                 }
@@ -228,60 +228,60 @@ namespace MagniboardBackend.Controllers
             }
 
 
-            return Ok(tableDTO);
+            return Ok(TemplateDTO);
         }
 
-        // POST: api/Table
+        // POST: api/Template
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PostTableDTO>> PostTable([FromBody] PostTableDTO tableDTO)
+        public async Task<ActionResult<PostTemplateDTO>> PostTemplate([FromBody] PostTemplateDTO TemplateDTO)
         {
-            if (_context.Table == null)
+            if (_context.Template == null)
             {
                 return Problem("Entity set 'Connection'  is null.");
             }
 
-            var table = mapper.Map<Table>(tableDTO);
-            await _context.Table.AddAsync(table);
+            var Template = mapper.Map<Template>(TemplateDTO);
+            await _context.Template.AddAsync(Template);
             await _context.SaveChangesAsync();
 
-            return Ok(table);
+            return Ok(Template);
         }
 
-        // DELETE: api/Table/5
+        // DELETE: api/Template/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTable(int id)
+        public async Task<IActionResult> DeleteTemplate(int id)
         {
-            if (_context.Table == null)
+            if (_context.Template == null)
             {
                 return NotFound();
             }
-            var table = await _context.Table
+            var Template = await _context.Template
                 .Include(i => i.rows)
                     .ThenInclude(j => j.cells)
                 .FirstOrDefaultAsync(x => x.id == id);
 
-            //if table.boardId != null
-            if (table == null)
+            //if Template.boardId != null
+            if (Template == null)
             {
                 return NotFound();
             }
-            if(table.boardId != null)
+            if(Template.boardId != null)
             {
                 var board = await _context.Board
-                    .FirstOrDefaultAsync(x => x.id == table.boardId);
+                    .FirstOrDefaultAsync(x => x.id == Template.boardId);
                 board.isActive = false;
             }
 
-            _context.Table.Remove(table);
+            _context.Template.Remove(Template);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool TableExists(int id)
+        private bool TemplateExists(int id)
         {
-            return (_context.Table?.Any(e => e.id == id)).GetValueOrDefault();
+            return (_context.Template?.Any(e => e.id == id)).GetValueOrDefault();
         }
     }
 }

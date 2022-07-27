@@ -8,8 +8,8 @@ namespace MagniboardBackend.Data.EntityModels
 
         public int rowOrder { get; set; }
 
-        [ForeignKey("tableId")]
-        public int tableId { get; set; }
+        [ForeignKey("TemplateId")]
+        public int TemplateId { get; set; }
 
         public virtual IList<Cell> cells { get; set; }
     }

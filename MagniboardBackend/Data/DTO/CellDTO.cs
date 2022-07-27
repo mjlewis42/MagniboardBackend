@@ -15,7 +15,7 @@ namespace MagniboardBackend.Data.DTO
         public string text { get; set; }
 
         [Required]
-        [ForeignKey("tableId")]
+        [ForeignKey("TemplateId")]
         public int rowId { get; set; }
     }
 }

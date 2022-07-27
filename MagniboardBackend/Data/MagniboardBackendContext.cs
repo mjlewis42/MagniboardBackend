@@ -19,8 +19,8 @@ namespace MagniboardBackend.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder
-                .Entity<Table>()
-                .Property(p => p.showTableHeader)
+                .Entity<Template>()
+                .Property(p => p.showTemplateHeader)
                 .HasConversion(
                     v => v ? 1 : 0,
                     v => (v == 1));
@@ -44,8 +44,8 @@ namespace MagniboardBackend.Data
                     v => (v == 1));
         }
 
-        public DbSet<Magnets> Magnets { get; set; }
-        public DbSet<Table> Table { get; set; }
+        public DbSet<Magnet> Magnet { get; set; }
+        public DbSet<Template> Template { get; set; }
         public DbSet<Board> Board { get; set; }
     }
 }

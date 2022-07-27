@@ -4,15 +4,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MagniboardBackend.Data.EntityModels
 {
-    public class Table
+    public class Template
     {
         public int id { get; set; }
 
-        public string tableName { get; set; }
+        public string templateName { get; set; }
 
-        public string tableHeader { get; set; }
+        public string templateHeader { get; set; }
 
-        public bool showTableHeader { get; set; }
+        public bool showTemplateHeader { get; set; }
 
         public int? boardId { get; set; }
 

@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/mbserver1/databases/Magniboard",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings:MagniboardBackendContext",
+      "dynamicId": null
+    }
+  }
+}

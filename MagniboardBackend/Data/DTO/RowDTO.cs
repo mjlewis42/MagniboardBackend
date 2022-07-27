@@ -12,8 +12,8 @@ namespace MagniboardBackend.Data.DTO
         public int rowOrder { get; set; }
 
         [Required]
-        [ForeignKey("tableId")]
-        public int tableId { get; set; }
+        [ForeignKey("TemplateId")]
+        public int TemplateId { get; set; }
 
         public IList<CellDTO> cells { get; set; }
     }

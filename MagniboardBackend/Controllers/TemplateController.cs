@@ -65,7 +65,7 @@ namespace MagniboardBackend.Controllers
 
         // GET: api/Template/GetUnlinkedTemplates
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TemplateDTO>>> GetUnlinkedTemplates()
+        public async Task<ActionResult<IEnumerable<TemplateDTO>>> GetActiveTemplates()
         {
             if (_context.Template == null)
             {
@@ -73,8 +73,7 @@ namespace MagniboardBackend.Controllers
             }
 
             var Templates = await _context.Template
-                 .Where(b => b.boardId == null)
-                    
+                 .Where(b => b.isActive)
                     .ToListAsync();
 
             var TemplateDTOs = mapper.Map<List<TemplateDTO>>(Templates);
@@ -97,9 +96,6 @@ namespace MagniboardBackend.Controllers
                     .ThenInclude(j => j.cells)
                 .FirstOrDefaultAsync(x => x.id == id);
 
-            if(Template.boardId != null) { 
-                return BadRequest(); 
-            }
             if(Template == null)
             {
                 return BadRequest();
@@ -128,59 +124,7 @@ namespace MagniboardBackend.Controllers
         }
 
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<PutUnlinkTemplateDTO>> PutUnlinkTemplate(int id, PutUnlinkTemplateDTO TemplateDTO)
-        {
-            if (_context.Template == null)
-            {
-                return BadRequest();
-            }
-
-            var Template = await _context.Template
-                .FirstOrDefaultAsync(x => x.id == id);
-
-            if (Template == null)
-            {
-                return BadRequest();
-            }
-
-            var board = await _context.Board
-                .FirstOrDefaultAsync(x => x.id == Template.boardId);
-
-            if (board == null)
-            {
-                return BadRequest();
-            }
-
-            if (board.isActive)
-            {
-
-                return StatusCode(400, "Unable to unlink Template from live board.");
-            }
-
-            mapper.Map(TemplateDTO, Template);
-            _context.Entry(Template).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TemplateExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // PUT: api/Template/PutTemplateBoardId/5
+        /*// PUT: api/Template/PutTemplateBoardId/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<ActionResult<PutTemplateBoardIdDTO>> PutTemplateBoardId(int id, PutTemplateBoardIdDTO TemplateDTO)
@@ -229,7 +173,7 @@ namespace MagniboardBackend.Controllers
 
 
             return Ok(TemplateDTO);
-        }
+        }*/
 
         // POST: api/Template
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -266,12 +210,12 @@ namespace MagniboardBackend.Controllers
             {
                 return NotFound();
             }
-            if(Template.boardId != null)
+            /*if(Template.boardId != null)
             {
                 var board = await _context.Board
                     .FirstOrDefaultAsync(x => x.id == Template.boardId);
                 board.isActive = false;
-            }
+            }*/
 
             _context.Template.Remove(Template);
             await _context.SaveChangesAsync();

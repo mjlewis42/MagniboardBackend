@@ -15,7 +15,9 @@ namespace MagniboardBackend.Controllers
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class BoardsController : ControllerBase
+    
     {
+        /*
         private readonly MagniboardDbConnection _context;
         private readonly IMapper mapper;
 
@@ -231,5 +233,6 @@ namespace MagniboardBackend.Controllers
         {
             return (_context.Board?.Any(e => e.id == id)).GetValueOrDefault();
         }
+        */
     }
 }

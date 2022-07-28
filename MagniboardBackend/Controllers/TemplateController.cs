@@ -81,6 +81,29 @@ namespace MagniboardBackend.Controllers
             return Ok(TemplateDTOs);
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<GetTemplateDTO>> GetActiveTemplateById(int id)
+        {
+            if (_context.Template == null)
+            {
+                return NotFound();
+            }
+            var template = await _context.Template
+                .Where(b => b.isActive)
+                    .Include(j => j.rows)
+                        .ThenInclude(k => k.cells)
+                .FirstOrDefaultAsync(i => i.id == id);
+
+            if (template == null)
+            {
+                return NotFound();
+            }
+
+            var templateDTO = mapper.Map<GetTemplateDTO>(template);
+
+            return Ok(templateDTO);
+        }
+
         // PUT: api/Template/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]

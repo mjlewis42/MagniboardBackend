@@ -2,7 +2,7 @@
 
 namespace MagniboardBackend.Data.DTO
 {
-    public class PutTemplateDTO : TemplateDTO
+    public class GetTemplateDTO : TemplateDTO
     {
         
     }

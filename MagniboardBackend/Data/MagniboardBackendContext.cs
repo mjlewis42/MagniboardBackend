@@ -37,7 +37,7 @@ namespace MagniboardBackend.Data
                     v => v ? 1 : 0,
                     v => (v == 1));
             modelBuilder
-                .Entity<Board>()
+                .Entity<Template>()
                 .Property(p => p.isActive)
                 .HasConversion(
                     v => v ? 1 : 0,

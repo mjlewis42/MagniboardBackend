@@ -14,6 +14,6 @@ namespace MagniboardBackend.Data.EntityModels
 
         [ForeignKey("rowId")]
         public int rowId { get; set; }
-        //public Magnet magnet { get; set; }
+        public Magnet? magnet { get; set; }
     }
 }

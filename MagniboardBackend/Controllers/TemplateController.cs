@@ -83,7 +83,7 @@ namespace MagniboardBackend.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<GetTemplateDTO>> GetActiveTemplateById(int id)
+        public async Task<ActionResult<GetActiveBoardDTO>> GetActiveBoardWithPouchById(int id)
         {
             if (_context.Template == null)
             {
@@ -93,6 +93,7 @@ namespace MagniboardBackend.Controllers
                 .Where(b => b.isActive)
                     .Include(j => j.rows)
                         .ThenInclude(k => k.cells)
+                        .ThenInclude(m => m.magnet)
                 .FirstOrDefaultAsync(i => i.id == id);
 
             if (template == null)
@@ -100,9 +101,30 @@ namespace MagniboardBackend.Controllers
                 return NotFound();
             }
 
-            var templateDTO = mapper.Map<GetTemplateDTO>(template);
+            var templateDTO = mapper.Map<TemplateDTO>(template);
 
-            return Ok(templateDTO);
+            List<Magnet> magnetsOnBoard = new List<Magnet>();
+
+            foreach (Row row in template.rows)
+            {
+                foreach (Cell cell in row.cells)
+                {
+                    if (cell.magnet != null)
+                        magnetsOnBoard.Add(cell.magnet);
+                }
+            }
+
+            var magnetsPouch = await _context.Magnet.Where(mag => !magnetsOnBoard.Contains(mag)).ToListAsync();
+            //List<Magnet> currentMagnetPouch =  fullMagnetsPouch.Where(magnetsOnBoard);
+            var magnetsPouchDTO = mapper.Map<List<MagnetDTO>>(magnetsPouch);
+
+            GetActiveBoardDTO activeBoard = new GetActiveBoardDTO
+            {
+                magnetPouch = magnetsPouchDTO,
+                template = templateDTO
+            };
+
+            return Ok(activeBoard);
         }
 
         // PUT: api/Template/5
@@ -118,15 +140,48 @@ namespace MagniboardBackend.Controllers
             var Template = await _context.Template
                 .Include(i => i.rows)
                     .ThenInclude(j => j.cells)
+                    .ThenInclude(m => m.magnet)
                 .FirstOrDefaultAsync(x => x.id == id);
 
             if(Template == null)
             {
                 return BadRequest();
             }
+            Console.Write(Template);
+
+            //foreach (var row in TemplateDTO.rows)
+            //{
+            //    foreach (var rowT in Template.rows)
+            //    {
+            //        foreach (var cell in row.cells)
+            //        {
+            //            foreach (var cellT in rowT.cells)
+            //            {
+            //                if(cell.magnet == null && cellT.magnet != null)
+            //                {
+            //                    mapper.Map(cell.magnet, cellT.magnet);
+            //                    _context.Entry(cellT).Reference(c => c.magnet).IsModified = true;
+            //                    _context.SaveChanges();
+            //                }
+
+            //            }
+            //        }
+            //    }
+            //}
+
 
             mapper.Map(TemplateDTO, Template);
-            _context.Entry(Template).State = EntityState.Modified;
+
+            foreach(var row in Template.rows)
+            {
+                foreach (var cell in row.cells)
+                {
+                    _context.Entry(cell).State = EntityState.Modified;
+                }
+            }
+
+           // _context.Entry(Template).State = EntityState.Modified;
+
 
             try
             {

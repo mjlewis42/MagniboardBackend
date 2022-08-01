@@ -47,5 +47,6 @@ namespace MagniboardBackend.Data
         public DbSet<Magnet> Magnet { get; set; }
         public DbSet<Template> Template { get; set; }
         public DbSet<Board> Board { get; set; }
+        public DbSet<User> User { get; set; }
     }
 }

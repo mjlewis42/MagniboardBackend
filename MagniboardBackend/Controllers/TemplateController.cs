@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using MagniboardBackend.Data.EntityModels;
 using AutoMapper;
 using MagniboardBackend.Data.DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MagniboardBackend.Controllers
 {

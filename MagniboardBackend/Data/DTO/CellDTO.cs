@@ -17,6 +17,7 @@ namespace MagniboardBackend.Data.DTO
         [Required]
         [ForeignKey("TemplateId")]
         public int rowId { get; set; }
+
         public MagnetDTO? magnet { get; set; }
     }
 }

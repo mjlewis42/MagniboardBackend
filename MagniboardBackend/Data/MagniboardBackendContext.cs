@@ -9,8 +9,7 @@ namespace MagniboardBackend.Data
 {
     public class MagniboardDbConnection : DbContext
     {
-        public MagniboardDbConnection (DbContextOptions<MagniboardDbConnection> options)
-            : base(options)
+        public MagniboardDbConnection (DbContextOptions<MagniboardDbConnection> options) : base(options)
         {
         }
 
@@ -47,6 +46,7 @@ namespace MagniboardBackend.Data
         public DbSet<Magnet> Magnet { get; set; }
         public DbSet<Template> Template { get; set; }
         public DbSet<Board> Board { get; set; }
+        public DbSet<Cell> Cell { get; set; }
         public DbSet<User> User { get; set; }
     }
 }

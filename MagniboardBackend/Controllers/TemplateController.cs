@@ -11,6 +11,7 @@ using MagniboardBackend.Data.EntityModels;
 using AutoMapper;
 using MagniboardBackend.Data.DTO;
 using Microsoft.AspNetCore.Authorization;
+using System.Diagnostics;
 
 namespace MagniboardBackend.Controllers
 {
@@ -101,8 +102,9 @@ namespace MagniboardBackend.Controllers
                 return NotFound();
             }
 
-            var templateDTO = mapper.Map<TemplateDTO>(template);
+           var templateDTO = mapper.Map<TemplateDTO>(template);
 
+            
             List<Magnet> magnetsOnBoard = new List<Magnet>();
 
             foreach (Row row in template.rows)
@@ -130,61 +132,43 @@ namespace MagniboardBackend.Controllers
         // PUT: api/Template/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<ActionResult<PutTemplateDTO>> PutTemplate(int id, PutTemplateDTO TemplateDTO)
+        public async Task<ActionResult<TemplateDTO>> PutTemplate(int id,TemplateDTO TemplateDTO)
         {
-            if (id != TemplateDTO.id || _context.Template == null)
+            if (id != TemplateDTO.id)
             {
                 return BadRequest();
             }
 
-            var Template = await _context.Template
+            var template = await _context.Template
                 .Include(i => i.rows)
                     .ThenInclude(j => j.cells)
-                    .ThenInclude(m => m.magnet)
                 .FirstOrDefaultAsync(x => x.id == id);
 
-            if(Template == null)
+            if (template == null)
             {
                 return BadRequest();
             }
-            Console.Write(Template);
 
-            //foreach (var row in TemplateDTO.rows)
-            //{
-            //    foreach (var rowT in Template.rows)
-            //    {
-            //        foreach (var cell in row.cells)
-            //        {
-            //            foreach (var cellT in rowT.cells)
-            //            {
-            //                if(cell.magnet == null && cellT.magnet != null)
-            //                {
-            //                    mapper.Map(cell.magnet, cellT.magnet);
-            //                    _context.Entry(cellT).Reference(c => c.magnet).IsModified = true;
-            //                    _context.SaveChanges();
-            //                }
+            mapper.Map(TemplateDTO, template);
 
-            //            }
-            //        }
-            //    }
-            //}
-
-
-            mapper.Map(TemplateDTO, Template);
-
-            foreach(var row in Template.rows)
+            /*foreach (var row in TemplateDTO.rows)
             {
-                foreach (var cell in row.cells)
+                foreach(var cell in row.cells)
                 {
-                    _context.Entry(cell).State = EntityState.Modified;
+                    if(cell.magnet == null)
+                    {
+                        template.rows[0].cells[2].magnet = '1099';
+                    }
                 }
-            }
+            }*/
 
-           // _context.Entry(Template).State = EntityState.Modified;
 
+            _context.Entry(template).State = EntityState.Modified;
+            //_context.Entry(template).Property(p => p).IsModified = true;
 
             try
             {
+                
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -199,7 +183,7 @@ namespace MagniboardBackend.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(template);
         }
 
 

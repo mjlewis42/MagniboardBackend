@@ -10,6 +10,8 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 builder.Services.AddDbContext<MagniboardDbConnection>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MagniboardDbConnection") ?? throw new InvalidOperationException("Connection string 'MagniboardDbConnection' not found.")));

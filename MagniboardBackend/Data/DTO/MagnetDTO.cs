@@ -5,7 +5,6 @@ namespace MagniboardBackend.Data.DTO
     public class MagnetDTO
     {
         public int Id { get; set; }
-
         [Required]
         [StringLength(maximumLength: 50, ErrorMessage = "Your Template name is too long!")]
         public string MagnetName { get; set; } = null!;

@@ -31,6 +31,7 @@ namespace MagniboardBackend.Controllers
             }
 
             var cell = await _context.Cell
+                .Include(c => c.magnet)
                 .FirstOrDefaultAsync(x => x.id == id);
 
             if (cell == null)
@@ -38,13 +39,14 @@ namespace MagniboardBackend.Controllers
                 return BadRequest();
             }
 
-            if(cellDTO.magnet == null && cell.magnet != null)
-            {
-                cell.magnet = null;
-            }
+            //if(cellDTO.magnet == null && cell.magnet != null)
+            //{
+            //    cell.magnet = null;
+            //}
 
             mapper.Map(cellDTO, cell);
             _context.Entry(cell).State = EntityState.Modified;
+            //_context.Entry(cell).Navigation("magnet").
 
             try
             {

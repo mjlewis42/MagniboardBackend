@@ -3,7 +3,6 @@ using MagniboardBackend.Data;
 using MagniboardBackend.Data.DTO;
 using MagniboardBackend.Data.EntityModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -64,6 +63,7 @@ namespace MagniboardBackend.Controllers
             User user = new User()
             {
                 Username = request.Username,
+                role = "User",
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt
             };
@@ -71,9 +71,6 @@ namespace MagniboardBackend.Controllers
             var loginTemplate = mapper.Map<User>(user);
             await _context.AddAsync(loginTemplate);
             await _context.SaveChangesAsync();
-            /*user.Username = request.Username;
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;*/
             return Ok(user);
         }
 
@@ -150,12 +147,10 @@ namespace MagniboardBackend.Controllers
 
         private string CreateToken(User user)
         {
-            var getUser = _context.User
-                .FirstOrDefaultAsync(i => i.Username == user.Username);
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, "Admin")
+                new Claim(ClaimTypes.Name , user.Username),
+                new Claim(ClaimTypes.Role, user.role)
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(

@@ -65,6 +65,7 @@ namespace MagniboardBackend.Controllers
             return TemplateDTO;
         }
 
+
         // GET: api/Template/GetUnlinkedTemplates
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TemplateDTO>>> GetActiveTemplates()
@@ -129,8 +130,10 @@ namespace MagniboardBackend.Controllers
             return Ok(activeBoard);
         }
 
+
         // PUT: api/Template/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult<TemplateDTO>> PutTemplate(int id,TemplateDTO TemplateDTO)
         {
@@ -240,6 +243,7 @@ namespace MagniboardBackend.Controllers
 
         // POST: api/Template
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<PostTemplateDTO>> PostTemplate([FromBody] PostTemplateDTO TemplateDTO)
         {
@@ -256,6 +260,7 @@ namespace MagniboardBackend.Controllers
         }
 
         // DELETE: api/Template/5
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTemplate(int id)
         {

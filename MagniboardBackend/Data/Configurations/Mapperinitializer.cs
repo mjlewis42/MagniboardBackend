@@ -32,6 +32,9 @@ namespace MagniboardBackend.Data.Configurations
 
             CreateMap<Cell, CellDTO>().ReverseMap();
 
+            CreateMap<User, UserDTO>().ReverseMap();
+            CreateMap<UserRole, UserRoleDTO>().ReverseMap();
+
         }
     }
 }

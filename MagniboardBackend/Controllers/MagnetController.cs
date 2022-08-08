@@ -9,6 +9,7 @@ using MagniboardBackend.Data;
 using MagniboardBackend.Data.EntityModels;
 using AutoMapper;
 using MagniboardBackend.Data.DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MagniboardBackend.Controllers
 {
@@ -63,6 +64,7 @@ namespace MagniboardBackend.Controllers
         // PUT: api/Magnet/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutMagnet(int id, PutMagnetDTO magnetDTO)
         {
             if (id != magnetDTO.Id || _context.Magnet == null) 
@@ -102,6 +104,7 @@ namespace MagniboardBackend.Controllers
         // POST: api/Magnet
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<PostMagnetDTO>> PostMagnet(PostMagnetDTO magnetDTO)
         {
             if (_context.Magnet == null)
@@ -118,6 +121,7 @@ namespace MagniboardBackend.Controllers
 
         // DELETE: api/Magnet/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteMagnet(int id)
         {
             if (_context.Magnet == null)

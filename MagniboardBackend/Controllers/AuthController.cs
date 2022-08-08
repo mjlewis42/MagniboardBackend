@@ -35,7 +35,7 @@ namespace MagniboardBackend.Controllers
         {
             //option 1 (should probably start with other one and then switch to this)
             var userName = _userService.GetMyName();
-            var role = User.FindFirstValue(ClaimTypes.Role);
+            var role = User.FindFirstValue(ClaimTypes.Role).ToList();
             return Ok(new { userName, role});
 
             //option 2 (prevents a 'fat' controller with lots of logic and instead uses httpContext
@@ -63,10 +63,10 @@ namespace MagniboardBackend.Controllers
             User user = new User()
             {
                 Username = request.Username,
-                role = "User",
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt
             };
+
 
             var loginTemplate = mapper.Map<User>(user);
             await _context.AddAsync(loginTemplate);
@@ -90,12 +90,24 @@ namespace MagniboardBackend.Controllers
                 return BadRequest("Incorrect Username or Password (Password / take out later)");
             }
 
-            string token = CreateToken(userExists);
+            var rolesNames = await _context.UserRole
+                .Where(x => x.UserId == userExists.Id)
+                .Select(y => y.Role.roleName)
+                .ToListAsync();
+            var roles = await _context.UserRole
+                .Where(x => x.UserId == userExists.Id)
+                .Select(y => y.Role.Id)
+                .ToListAsync();
+            //create a variable to return ids in the ok() instead of role names
+
+            string token = CreateToken(userExists, rolesNames);
 
             //var refreshToken = GenerateRefreshToken();
             //SetRefreshToken(refreshToken);
 
-            return Ok(token);
+            var username = userExists.Username;
+
+            return Ok(new {token, username, roles});
         }
 
         /*[HttpPost("refresh-token")]
@@ -145,16 +157,19 @@ namespace MagniboardBackend.Controllers
             user.TokenExpires = newRefreshToken.Expires;
         }*/
 
-        private string CreateToken(User user)
+        private string CreateToken(User user, List<string> userRoles)
         {
-            List<Claim> claims = new List<Claim>
+            List<Claim> claims = new()
             {
-                new Claim(ClaimTypes.Name , user.Username),
-                new Claim(ClaimTypes.Role, user.role)
+                new Claim(ClaimTypes.Name, user.Username)
             };
+            foreach (var role in userRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value));
+            _configuration.GetSection("AppSettings:Token").Value));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 

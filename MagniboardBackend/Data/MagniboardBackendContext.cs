@@ -48,5 +48,7 @@ namespace MagniboardBackend.Data
         public DbSet<Board> Board { get; set; }
         public DbSet<Cell> Cell { get; set; }
         public DbSet<User> User { get; set; }
+        public DbSet<UserRole> UserRole { get; set; }
+        public DbSet<Role> Role { get; set; }
     }
 }

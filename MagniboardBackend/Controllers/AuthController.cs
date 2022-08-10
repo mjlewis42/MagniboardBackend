@@ -30,13 +30,45 @@ namespace MagniboardBackend.Controllers
             _userService = userService;
         }
 
-        [HttpGet("GetMe"), Authorize(Roles = "Admin")]
+        public enum RoleData
+        {
+            Admin = 1984,
+            Editor = 1911,
+            User = 1942
+        }
+
+        [HttpGet("GetMe")]
+        [Authorize(Roles = "Admin, Editor")]
         public ActionResult<string> GetMe()
         {
             //option 1 (should probably start with other one and then switch to this)
-            var userName = _userService.GetMyName();
-            var role = User.FindFirstValue(ClaimTypes.Role).ToList();
-            return Ok(new { userName, role});
+            var username = _userService.GetMyName();
+            var rolesNames = ((ClaimsIdentity)User.Identity).Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value);
+
+            List<RoleData> roles = new();
+            foreach (var role in rolesNames)
+            {
+                if(role == "Admin")
+                {
+                    roles.Add(RoleData.Admin);
+                }
+                else if(role == "Editor")
+                {
+                    roles.Add(RoleData.Editor);
+                }
+                else if(role == "User")
+                {
+                    roles.Add(RoleData.User);
+                }
+                else
+                {
+                    Console.WriteLine("Note a valid role");
+                }
+            }
+
+            return Ok(new { username, roles});
 
             //option 2 (prevents a 'fat' controller with lots of logic and instead uses httpContext
             //this is the alternate way of doing this without all the dependency injection stuff but is bad practice?
